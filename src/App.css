@@ -1,42 +1,60 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
+import React from "react";
+import { Bell, Menu } from "lucide-react";
+import WebApp from "@twa-dev/sdk";
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+export default function App() {
+  React.useEffect(() => {
+    WebApp.ready();
+    WebApp.expand();
+  }, []);
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4">
+      <header className="flex justify-between items-center mb-4">
+        <div className="font-bold text-lg">0 ကျပ် +</div>
+        <div className="flex gap-3">
+          <Bell className="w-6 h-6" />
+          <Menu className="w-6 h-6" />
+        </div>
+      </header>
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
+      <div className="bg-purple-700 rounded-xl p-4 mb-4">
+        <h2 className="text-lg font-semibold">KoeLa</h2>
+        <p className="text-sm mt-1">
+          မနက် 9 နာရီမှ ည 12 နာရီအတွင်းတင်မေးပါ။
+          10 မိနစ်အတွင်းအတုံ့ပြန်ပါမယ်။ Account လို့ရောက်လာပါမယ်။
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button className="bg-blue-500 rounded-md px-3 py-2">09956010434</button>
+          <button className="bg-sky-400 rounded-md px-3 py-2">Channel</button>
+          <button className="bg-green-500 rounded-md px-3 py-2">Group</button>
+          <button className="bg-indigo-500 rounded-md px-3 py-2">Account</button>
+        </div>
+      </div>
 
-.card {
-  padding: 2em;
-}
+      <h3 className="font-semibold text-xl mb-3">TOPUP</h3>
+      <div className="grid grid-cols-3 gap-3">
+        {["Singapore", "Philippine", "Malaysia", "Indonesia", "Russia"].map(
+          (country) => (
+            <div key={country} className="bg-white text-black rounded-lg p-2 shadow">
+              <img
+                src={`https://flagcdn.com/w320/${country
+                  .slice(0, 2)
+                  .toLowerCase()}.png`}
+                alt={country}
+                className="rounded-md mb-2"
+              />
+              <button className="bg-black text-white w-full py-1 rounded">
+                Buy Now
+              </button>
+            </div>
+          )
+        )}
+      </div>
 
-.read-the-docs {
-  color: #888;
+      <p className="text-center text-xs mt-6 opacity-70">
+        Privacy Policy | Terms & Conditions
+      </p>
+    </div>
+  );
 }

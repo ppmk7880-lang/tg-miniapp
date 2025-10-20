@@ -1,161 +1,103 @@
-import { useEffect, useMemo, useState } from "react";
-import WebApp from "@twa-dev/sdk"; // ✅ ဒီလို import မရှိရင်အလုပ်မလုပ်ပါ
+import React, { useEffect } from "react";
+import WebApp from "@twa-dev/sdk";
 
-function getUserSafe() {
-  return (
-    WebApp.initDataUnsafe?.user ?? {
-      id: 0,
-      first_name: "Guest",
-      username: "dev_preview",
-      language_code: "en",
-    }
-  );
-}
+// 👇 products ကို ဒီဖိုင်ထဲမှာပဲ ထည့်ထားတယ် (import မလိုအောင်)
+const products = [
+  { id: 1, name: "Weekly Pass",   price: "6000 ကျပ်",   image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
+  { id: 2, name: "Twilight Pass", price: "32200 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
+  { id: 3, name: "50+50 အပိုရ",   price: "3500 ကျပ်",  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
+  { id: 4, name: "150+150 အပိုရ", price: "10300 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
+  { id: 5, name: "250+250 အပိုရ", price: "15600 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
+  { id: 6, name: "500+500 အပိုရ", price: "31100 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
+  { id: 7, name: "86", price: "4800 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 8, name: "172", price: "10200 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 9, name: "257", price: "15300 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 10, name: "343", price: "20500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 11, name: "429", price: "25500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 12, name: "514", price: "31200 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 13, name: "600", price: "35500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 14, name: "706", price: "40500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 15, name: "878", price: "50800 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 16, name: "1049", price: "60000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 17, name: "1135", price: "66500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",}, 
+  { id: 18, name: "1412", price: "80000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 19, name: "1669", price: "95500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 20, name: "2195", price: "122500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 21, name: "2538", price: "143000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 22, name: "2901", price: "160000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 23, name: "3688", price: "205000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},   
+  { id: 24, name: "4394", price: "245500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 25, name: "5532", price: "312000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 26, name: "6238", price: "352500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",},
+  { id: 27, name: "9288", price: "500000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s",}, 
+];
 
 export default function App() {
-  const [ready, setReady] = useState(false);
-  const user = useMemo(getUserSafe, []);
+  useEffect(() => { WebApp.ready(); WebApp.expand(); }, []);
 
-  useEffect(() => {
-    // Telegram WebApp ကို initialize
-    WebApp.ready();
-    WebApp.expand();
-
-    // Theme color ကိုအလိုအလျောက်ပြောင်း
-    const setTheme = () => {
-      document
-        .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", WebApp.themeParams?.bg_color || "#0e1621");
-    };
-    setTheme();
-    WebApp.onEvent("themeChanged", setTheme);
-
-    // ✅ Main Button Setup
-    WebApp.MainButton.setText("Confirm");
-    WebApp.MainButton.show();
-    WebApp.MainButton.onClick(() => {
-      try {
-        WebApp.HapticFeedback?.impactOccurred("medium");
-      } catch {}
-      WebApp.showPopup({
-        title: "Done",
-        message: "Thanks! Closing the app…",
-        buttons: [{ type: "ok" }],
-      });
-      setTimeout(() => WebApp.close(), 400);
-    });
-
-    // ✅ Back Button Setup
-    WebApp.BackButton.show();
-    WebApp.BackButton.onClick(() => WebApp.close());
-
-    setReady(true);
-
-    // cleanup
-    return () => {
-      WebApp.offEvent("themeChanged", setTheme);
-      WebApp.MainButton.offClick();
-      WebApp.BackButton.hide();
-    };
-  }, []);
-
-  // Theme color variables
-  const bg =
-    WebApp.themeParams?.bg_color ||
-    (WebApp.colorScheme === "dark" ? "#0e1621" : "#ffffff");
-  const text =
-    WebApp.themeParams?.text_color ||
-    (WebApp.colorScheme === "dark" ? "#fff" : "#000");
-  const card =
-    WebApp.themeParams?.secondary_bg_color ||
-    (WebApp.colorScheme === "dark" ? "#17212b" : "#f5f5f7");
-  const section =
-    WebApp.themeParams?.section_bg_color ||
-    (WebApp.colorScheme === "dark" ? "#0f1822" : "#fff");
-
-  // ✅ UI Layout
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        padding: 16,
-        display: "grid",
-        placeItems: "center",
-        fontFamily:
-          "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial",
-        color: text,
-        background: bg,
-        transition: "background 150ms ease",
-      }}
-    >
-      <div
-        style={{
-          width: "min(680px, 92vw)",
-          borderRadius: 16,
-          padding: 20,
-          boxShadow:
-            WebApp.colorScheme === "dark"
-              ? "0 8px 30px rgba(0,0,0,.45)"
-              : "0 8px 30px rgba(0,0,0,.1)",
-          background: card,
-        }}
-      >
-        <h1 style={{ margin: 0, fontSize: 22, lineHeight: 1.25 }}>
-          Hello {user?.first_name} 👋
-        </h1>
-        <p style={{ opacity: 0.8, marginTop: 8 }}>
-          This is a React Telegram Mini App starter.
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4">
+      {/* Header */}g
+      <header className="flex justify-between items-center mb-4">
+        <div className="font-bold text-lg">0 ကျပ် +</div>
+      </header>
 
-        <div
-          style={{
-            marginTop: 16,
-            padding: 16,
-            borderRadius: 12,
-            background: section,
-            border:
-              WebApp.colorScheme === "dark"
-                ? "1px solid rgba(255,255,255,.08)"
-                : "1px solid rgba(0,0,0,.06)",
-          }}
-        >
-          <b>User preview</b>
-          <pre
-            style={{
-              marginTop: 8,
-              overflow: "auto",
-              whiteSpace: "pre-wrap",
-              fontSize: 12,
-              opacity: 0.9,
-            }}
-          >
-            {JSON.stringify(user, null, 2)}
-          </pre>
+      {/* Info Card */}
+      <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-4">
+        <h2 className="text-2xl font-semibold mb-1">Hello Buddy 👋</h2>
+        <p className="opacity-90">CasaNova Game Store </p>
+
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <a className="bg-blue-500 rounded-md px-3 py-2 text-center" href="tel:09956010434">@casanova_097</a>
+          <button className="bg-sky-400 rounded-md px-3 py-2">Channel</button>
+          <button className="bg-indigo-500 rounded-md px-3 py-2">Account</button>
         </div>
-
-        <div style={{ marginTop: 18, fontSize: 13, opacity: 0.8 }}>
-          {ready ? "UI ready ✅" : "Initializing…"}
-        </div>
-
-        <button
-          onClick={() => {
-            try {
-              WebApp.HapticFeedback?.notificationOccurred("success");
-            } catch {}
-            WebApp.showAlert("Custom action clicked!");
-          }}
-          style={{
-            marginTop: 16,
-            padding: "10px 14px",
-            borderRadius: 10,
-            border: "none",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
-          Custom Button
-        </button>
       </div>
+
+      {/* Product Grid */}
+
+      <h3 className="font-semibold text-xl mb-3">TOPUP</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {products.map((item) => (
+          <div
+            key={item.id}
+            className="bg-white text-black rounded-lg p-3 shadow flex flex-col items-center hover:scale-105 transition-transform"
+          >
+            <img src={item.image} alt={item.name} className="rounded-md mb-2 w-20 h-20 object-contain" />
+            <h4 className="text-sm font-semibold text-center">{item.name}</h4>
+            <p className="text-xs opacity-70 mb-2">{item.price}</p>
+            <button
+  onClick={() => buy(item)}
+  className="bg-black text-white w-full py-1 rounded active:scale-95"
+>
+  Buy Now
+</button>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <p className="text-center text-xs mt-6 opacity-80">
+        Privacy Policy | Terms & Conditions
+      </p>
     </div>
   );
+}
+// handler
+function buy(item) {
+  WebApp.showPopup({
+    title: "Confirm purchase",
+    message: `${item.name}\nဈေးနှုန်း: ${item.price}\nဝယ်ချင်တာမှန်ပါသလား?`,
+    buttons: [
+      { id: "cancel", type: "cancel", text: "မဝယ်ပါ" },
+      { id: "ok", type: "ok", text: "ဝယ်မယ်" },
+    ],
+  }, (btnId) => {
+    if (btnId === "ok") {
+      // ဒီနေရာကနေ order data ကို bot/server လို့ပို့နိုင်တယ်
+      // WebApp.sendData(JSON.stringify({ type: "order", item }));
+      WebApp.HapticFeedback?.notificationOccurred("success");
+      WebApp.showAlert("Thanks! Order received.");
+    }
+  });
 }
