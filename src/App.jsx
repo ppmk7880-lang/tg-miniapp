@@ -73,7 +73,7 @@ export default function App() {
 
       {/* Info Card */}
       <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-4">
-        <h2 className="text-2xl font-semibold mb-1">Hello ကြိုဆိုပါတယ် 👋</h2>
+        <h2 className="text-2xl font-semibold mb-1">Hello ကြိုဆိုပါတယ်ဗျာ 👋</h2>
         <p className="opacity-90">CasaNova Game Store</p>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
@@ -91,7 +91,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* Product Grid */}
+      {/* ✅ Product Grid */}
       <h3 className="font-semibold text-xl mb-3">TOPUP</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {products.map((item) => (
@@ -102,49 +102,17 @@ export default function App() {
             <img
               src={item.image}
               alt={item.name}
-              className="rounded-md mb-2 w-20 h-20 object-contain"
+              className="rounded-md mb-2 w-20 h-20 object-contain pointer-events-none"
             />
             <h4 className="text-sm font-semibold text-center">{item.name}</h4>
             <p className="text-xs opacity-70 mb-2">{item.price}</p>
             <button
+              type="button"
               onClick={() => buy(item)}
-              className="bg-black text-white w-full py-1 rounded active:scale-95"
+              className="bg-black text-white w-full py-2 rounded active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
             >
               Buy Now
             </button>
-            <button
-  onClick={() => {
-    // click ဖြစ်/မဖြစ် စစ်ရန်
-    console.log("CLICK:", item);
-
-    // Telegram webview အတွင်းဖြစ်/မဖြစ် စစ်ပြီး မဟုတ်ရင် alert fallback
-    if (!WebApp?.showPopup) {
-      alert(`(Local preview)\n${item.name}\n${item.price}`);
-      return;
-    }
-
-    WebApp.showPopup(
-      {
-        title: "Confirm purchase",
-        message: `${item.name}\nဈေးနှုန်း: ${item.price}\nဝယ်ချင်တာမှန်ပါသလား?`,
-        buttons: [
-          { id: "cancel", type: "cancel", text: "မဝယ်ပါ" },
-          { id: "ok", type: "ok", text: "ဝယ်မယ်" },
-        ],
-      },
-      (btnId) => {
-        if (btnId === "ok") {
-          WebApp.HapticFeedback?.notificationOccurred("success");
-          WebApp.showAlert("Thanks! Order received ✅");
-        }
-      }
-    );
-  }}
-  className="bg-black text-white w-full py-1 rounded active:scale-95"
->
-  Buy Now
-</button>
-
           </div>
         ))}
       </div>
