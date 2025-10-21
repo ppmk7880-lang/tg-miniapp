@@ -144,11 +144,7 @@ export default function App() {
 
       </div>
 
-      {/* Footer */}
-      <p className="text-center text-xs mt-6 opacity-80">
-        Privacy Policy | Terms & Conditions
-      </p>
-    </div>
+     
   );
 }
 useEffect(() => {
@@ -183,3 +179,8 @@ useEffect(() => {
   WebApp.ready(); WebApp.expand();
   authWithTelegram(WebApp).catch(console.error);
 }, []);
+ {/* Footer */}
+      <p className="text-center text-xs mt-6 opacity-80">
+        Privacy Policy | Terms & Conditions
+      </p>
+    </div>
