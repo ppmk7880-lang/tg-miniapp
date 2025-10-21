@@ -137,3 +137,35 @@ export default function App() {
     </div>
   );
 }
+useEffect(() => {
+  WebApp.ready(); WebApp.expand();
+  authWithTelegram(WebApp).catch(console.error);
+}, []);
+import React, { useState } from "react";
+import OrderModal from "./components/OrderModal";
+
+export default function App() {
+  const [activeItem, setActiveItem] = useState(null);
+
+  return (
+    <div className="p-4">
+      {/* product grid example */}
+      {products.map((item) => (
+        <div key={item.id}>
+          <h4>{item.name}</h4>
+          <p>{item.price}</p>
+          <button
+            onClick={() => setActiveItem(item)}
+            className="bg-black text-white py-2 px-4 rounded"
+          >
+            Buy Now
+          </button>
+        </div>
+      ))}
+
+      {activeItem && (
+        <OrderModal item={activeItem} onClose={() => setActiveItem(null)} />
+      )}
+    </div>
+  );
+}
