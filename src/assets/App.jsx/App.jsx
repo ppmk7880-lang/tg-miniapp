@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 import WebApp from "@twa-dev/sdk";
+import OrderModal from "../../components/OrderModal";         // Modal ကို သုံးမယ်ဆိုရင်
+// submitOrder / uploadReceipt ကို App.jsx ထဲကနေ တိုက်ရိုက်ခေါ်မယ်ဆိုရင်သာ အောက်ကလို import လုပ်ပါ
+import { submitOrder, uploadReceipt } from "../../lib/api";
 
 // ✅ products data (27 items)
 const products = [
@@ -128,6 +131,17 @@ export default function App() {
 
           </div>
         ))}
+        {/* ✅ Modal ကို အောက်ကလို render */}
+      {activeItem && (
+        <OrderModal
+          item={activeItem}
+          onClose={() => setActiveItem(null)}
+        />
+      )}
+    </div>
+  );
+}
+
       </div>
 
       {/* Footer */}
@@ -142,7 +156,7 @@ useEffect(() => {
   authWithTelegram(WebApp).catch(console.error);
 }, []);
 import React, { useState } from "react";
-import OrderModal from "./components/OrderModal";
+import OrderModal from "../../components/OrderModal";
 
 export default function App() {
   const [activeItem, setActiveItem] = useState(null);
@@ -165,7 +179,3 @@ export default function App() {
 
       {activeItem && (
         <OrderModal item={activeItem} onClose={() => setActiveItem(null)} />
-      )}
-    </div>
-  );
-}
