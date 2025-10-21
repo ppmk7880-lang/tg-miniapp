@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+// src/...(your path)/App.jsx
+import React, { useEffect, useState } from "react";
 import WebApp from "@twa-dev/sdk";
-import OrderModal from "../../components/OrderModal";         // Modal ကို သုံးမယ်ဆိုရင်
-// submitOrder / uploadReceipt ကို App.jsx ထဲကနေ တိုက်ရိုက်ခေါ်မယ်ဆိုရင်သာ အောက်ကလို import လုပ်ပါ
-import { submitOrder, uploadReceipt } from "../../lib/api";
+import OrderModal from "../../components/OrderModal";
 
 // ✅ products data (27 items)
 const products = [
@@ -29,17 +28,53 @@ const products = [
   { id: 21, name: "2538", price: "143000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
   { id: 22, name: "2901", price: "160000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
   { id: 23, name: "3688", price: "205000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
-  { id: 24, name: "4394", price: "245500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
+  { id: 24, name: "4394", price: "245500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9uဩVMuUpoi1BpFtm8kkKsgYyA&s" },
   { id: 25, name: "5532", price: "312000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
   { id: 26, name: "6238", price: "352500 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
   { id: 27, name: "9288", price: "500000 ကျပ်", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFX3Tzs4Dl9u84VMuUpoi1BpFtm8kkKsgYyA&s" },
 ];
 
 export default function App() {
+  const [activeItem, setActiveItem] = useState(null);
+
   useEffect(() => {
-    WebApp.ready();
-    WebApp.expand();
+    try {
+      WebApp.ready();
+      WebApp.expand();
+    } catch {
+      // Local preview သို့မဟုတ် browser run 时 WebApp မရှိနိုင်လို့
+      console.debug("WebApp not available in local preview.");
+    }
   }, []);
+
+  const handleBuy = (item) => {
+    // Telegram Mini App အတွင်း: Telegram popup သုံးမယ်
+    if (window?.Telegram?.WebApp) {
+      const WA = window.Telegram.WebApp;
+      WA.showPopup(
+        {
+          title: "Confirm purchase",
+          message: `${item.name}\nဈေးနှုန်း: ${item.price}\nဝယ်ချင်တာမှန်ပါသလား?`,
+          buttons: [
+            { id: "cancel", type: "cancel", text: "မဝယ်ပါ" },
+            { id: "ok", type: "ok", text: "ဝယ်မယ်" },
+          ],
+        },
+        (btnId) => {
+          if (btnId === "ok") {
+            WA.HapticFeedback?.notificationOccurred("success");
+            // Telegram အတွင်းမှာတော့ alert ပြပြီး flow ဆက်
+            WA.showAlert("Thanks! Order received ✅");
+            // လိုချင်ရင် ဒီနေရာကနေ Modal ကိုလည်း ဖွင့်နိုင်တယ်
+            // setActiveItem(item);
+          }
+        }
+      );
+      return;
+    }
+    // Browser/local preview: ကိုယ့်ရဲ့ Modal ဖွင့်ပြီး payment + screenshot ယူမယ်
+    setActiveItem(item);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4">
@@ -85,102 +120,26 @@ export default function App() {
             <p className="text-xs opacity-70 mb-2">{item.price}</p>
 
             <button
-  type="button"
-  // 👉 overlay/parent စီးကမ်းမဝင်အောင်
-  onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
-  onPointerDown={(e) => { e.stopPropagation(); }}
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Browser fallback (Telegram မရှိပါက)
-    if (!window?.Telegram?.WebApp) {
-      alert(`(Local preview)\nProduct: ${item.name}\nPrice: ${item.price}`);
-      return;
-    }
-
-    const WebApp = window.Telegram.WebApp;
-    WebApp.showPopup(
-      {
-        title: "Confirm purchase",
-        message: `${item.name}\nဈေးနှုန်း: ${item.price}\nဝယ်ချင်တာမှန်ပါသလား?`,
-        buttons: [
-          { id: "cancel", type: "cancel", text: "မဝယ်ပါ" },
-          { id: "ok", type: "ok", text: "ဝယ်မယ်" },
-        ],
-      },
-      (btnId) => {
-        if (btnId === "ok") {
-          WebApp.HapticFeedback?.notificationOccurred("success");
-          WebApp.showAlert("Thanks! Order received ✅");
-        }
-      }
-    );
-  }}
-  className="relative z-[2147483647] bg-black text-white w-full py-2 rounded
-             active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black
-             cursor-pointer select-none pointer-events-auto"
-  style={{
-    position: "relative",
-    zIndex: 2147483647,            // 🧨 ဘယ် overlay မဆို မကျော်နိုင်အောင် သတ်မှတ်
-    WebkitTapHighlightColor: "transparent",
-  }}
->
-  Buy Now
-</button>
-
+              type="button"
+              onClick={() => handleBuy(item)}
+              className="bg-black text-white w-full py-2 rounded active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black cursor-pointer select-none"
+              style={{ WebkitTapHighlightColor: "transparent" }}
+            >
+              Buy Now
+            </button>
           </div>
         ))}
-        {/* ✅ Modal ကို အောက်ကလို render */}
-      {activeItem && (
-        <OrderModal
-          item={activeItem}
-          onClose={() => setActiveItem(null)}
-        />
-      )}
-    </div>
-  );
-}
-
       </div>
 
-     
-  );
-}
-useEffect(() => {
-  WebApp.ready(); WebApp.expand();
-  authWithTelegram(WebApp).catch(console.error);
-}, []);
-import React, { useState } from "react";
-import OrderModal from "../../components/OrderModal";
-
-export default function App() {
-  const [activeItem, setActiveItem] = useState(null);
-
-  return (
-    <div className="p-4">
-      {/* product grid example */}
-      {products.map((item) => (
-        <div key={item.id}>
-          <h4>{item.name}</h4>
-          <p>{item.price}</p>
-          <button
-            onClick={() => setActiveItem(item)}
-            className="bg-black text-white py-2 px-4 rounded"
-          >
-            Buy Now
-          </button>
-        </div>
-      ))}
-
+      {/* ✅ Local preview (Browser) အတွက် Order Modal */}
       {activeItem && (
         <OrderModal item={activeItem} onClose={() => setActiveItem(null)} />
-useEffect(() => {
-  WebApp.ready(); WebApp.expand();
-  authWithTelegram(WebApp).catch(console.error);
-}, []);
- {/* Footer */}
-      <p className="text-center text-xs mt-6 opacity-80">
-        Privacy Policy | Terms & Conditions
-      </p>
+      )}
+
+      {/* Footer */}
+      <div className="footer mt-6 opacity-90 text-sm">
+        <p>Privacy Policy | Terms &amp; Conditions</p>
+      </div>
     </div>
+  );
+}
