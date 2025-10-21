@@ -179,3 +179,7 @@ export default function App() {
 
       {activeItem && (
         <OrderModal item={activeItem} onClose={() => setActiveItem(null)} />
+useEffect(() => {
+  WebApp.ready(); WebApp.expand();
+  authWithTelegram(WebApp).catch(console.error);
+}, []);

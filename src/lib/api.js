@@ -74,3 +74,12 @@ export async function submitOrder({ item, playerId, payMethod, file }) {
     WebApp.MainButton.hideProgress?.();
   }
 }
+export async function authWithTelegram(WebApp) {
+  const initData = WebApp.initData || "";
+  const res = await fetch("/api/auth/telegram", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ initData }),
+  });
+  if (!res.ok) throw new Error("Auth failed");
+  return res.json(); // { user: { telegram_id, ... } }
+}
